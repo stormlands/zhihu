@@ -10,6 +10,14 @@ __pycache__/
 instance/
 .webassets-cache
 
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# SQLite databases
+*.sqlite
+
 # virtualenv
 venv/
 ENV/
