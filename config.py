@@ -8,6 +8,7 @@ class Config:
 	ZHIHU_MAIL_SUBJECT_PREFIX = '[Zhihu]'
 	ZHIHU_MAIL_SENDER = 'Zhihu Admin <myemail@163.com>'
 	ZHIHU_ADMIN = os.environ.get('ZHIHU_ADMIN')
+	ZHIHU_POSTS_PER_PAGE = 20
 
 	@staticmethod
 	def init_app(app):
