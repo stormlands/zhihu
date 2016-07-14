@@ -10,6 +10,7 @@ class Config:
 	ZHIHU_ADMIN = os.environ.get('ZHIHU_ADMIN')
 	ZHIHU_POSTS_PER_PAGE = 20
 	ZHIHU_FOLLOWERS_PER_PAGE = 50
+	ZHIHU_COMMENTS_PER_PAGE = 30
 
 	@staticmethod
 	def init_app(app):
