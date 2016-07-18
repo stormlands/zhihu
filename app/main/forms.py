@@ -1,12 +1,10 @@
+# -*- coding: utf-8 -*-
 from flask_wtf import Form
 from wtforms import StringField, SubmitField, TextAreaField, BooleanField, SelectField
 from wtforms.validators import Required, Length, Email, Regexp, ValidationError
 from flask_pagedown.fields import PageDownField
 from ..models import Role, User
 
-class NameForm(Form):
-	name = StringField('What is your name?', validators=[Required()])
-	submit = SubmitField('Submit')
 
 class EditProfileForm(Form):
 	name = StringField('Real name', validators=[Length(0, 64)])
@@ -46,5 +44,10 @@ class PostForm(Form):
 
 class CommentForm(Form):
 	body = StringField('Enter your comment', validators=[Required()])
+	submit = SubmitField('Submit')
+
+class AskQuestionForm(Form):
+	title = StringField('Your question:', validators=[Required()])
+	body = PageDownField('Discription of question', validators=[Required()])
 	submit = SubmitField('Submit')
 

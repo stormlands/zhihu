@@ -5,12 +5,19 @@ class Config:
 	SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
 	SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 	SQLALCHEMY_TRACK_MODIFICATIONS = True
-	ZHIHU_MAIL_SUBJECT_PREFIX = '[Zhihu]'
-	ZHIHU_MAIL_SENDER = 'Zhihu Admin <myemail@163.com>'
-	ZHIHU_ADMIN = os.environ.get('ZHIHU_ADMIN')
-	ZHIHU_POSTS_PER_PAGE = 20
-	ZHIHU_FOLLOWERS_PER_PAGE = 50
-	ZHIHU_COMMENTS_PER_PAGE = 30
+	SQLALCHEMY_RECORD_QUERIES = True
+	MAIL_SERVER = 'smtp.163.com'
+	MAIL_PORT = '25'
+	MAIL_USE_TLS = True
+	MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+	MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+	QA_MAIL_SUBJECT_PREFIX = '[QA]'
+	QA_MAIL_SENDER = 'QA Admin <fanshaojie168@163.com>'
+	QA_ADMIN = os.environ.get('QA_ADMIN')
+	ZHIHU_POSTS_PER_PAGE = 10
+	ZHIHU_FOLLOWERS_PER_PAGE = 30
+	ZHIHU_COMMENTS_PER_PAGE = 20
+	QA_SLOW_DB_QUERY_TIME = 0.5
 
 	@staticmethod
 	def init_app(app):
@@ -18,11 +25,6 @@ class Config:
 
 class DevelopmentConfig(Config):
 	DEBUG = True
-	MAIL_SERVER = 'smtp.163.com'
-	MAIL_PORT = 25
-	MAIL_USE_TLS = True
-	MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-	MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 	SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
 		'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
 

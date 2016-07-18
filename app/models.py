@@ -54,6 +54,13 @@ class Follow(db.Model):
 	followed_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
 	timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+focus = db.Table('focus',
+	db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+	db.Column('post_id', db.Integer, db.ForeignKey('posts.id')))
+
+focusquestion = db.Table('focusquestion',
+	db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+	db.Column('question_id', db.Integer, db.ForeignKey('questions.id')))
 
 class User(UserMixin, db.Model):
 	__tablename__ = 'users'
@@ -71,6 +78,14 @@ class User(UserMixin, db.Model):
 	avatar_hash = db.Column(db.String(32))
 	posts = db.relationship('Post', backref='author', lazy='dynamic')
 	comments = db.relationship('Comment', backref='author', lazy='dynamic')
+	focus_posts = db.relationship('Post', secondary=focus,
+						backref=db.backref('focus_users', lazy='dynamic'),
+						lazy='dynamic')
+	focus_questions = db.relationship('Question', secondary=focusquestion,
+					backref=db.backref('focus_users', lazy='dynamic'),
+					lazy='dynamic')
+
+	questions = db.relationship('Question', backref='author', lazy='dynamic')
 	followed = db.relationship('Follow',
 							foreign_keys=[Follow.follower_id],
 							backref=db.backref('follower', lazy='joined'),
@@ -93,7 +108,7 @@ class User(UserMixin, db.Model):
 	def __init__(self, **kwargs):
 		super(User, self).__init__(**kwargs)
 		if self.role is None:
-			if self.email == current_app.config['ZHIHU_ADMIN']:
+			if self.email == current_app.config['QA_ADMIN']:
 				self.role = Role.query.filter_by(permissions=0xff).first()
 			if self.role is None:
 				self.role = Role.query.filter_by(default=True).first()
@@ -223,6 +238,32 @@ class User(UserMixin, db.Model):
 	def is_followed_by(self, user):
 		return self.followers.filter_by(follower_id=user.id).first() is not None
 	
+	def is_focus_post(self, post):
+		return post in self.focus_posts.all()
+
+	def focus_post(self, post):
+		if not self.is_focus_post(post):
+			self.focus_posts.append(post)
+			db.session.add(self)
+
+	def unfocus_post(self, post):
+		if self.is_focus_post(post):
+			self.focus_posts.remove(post)
+			db.session.add(self)
+
+	def is_focus_question(self, question):
+		return question in self.focus_questions.all()
+
+	def focus_question(self, question):
+		if not self.is_focus_question(question):
+			self.focus_questions.append(question)
+			db.session.add(self)
+
+	def unfocus_question(self, question):
+		if self.is_focus_question(question):
+			self.focus_questions.remove(question)
+			db.session.add(self)
+
 	@property
 	def followed_posts(self):
 		return Post.query.join(Follow, Follow.followed_id == Post.author_id).filter(Follow.follower_id == self.id)
@@ -247,6 +288,7 @@ class Post(db.Model):
 	author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	body_html = db.Column(db.Text)
 	comments = db.relationship('Comment', backref='post', lazy='dynamic')
+	question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
 
 	@staticmethod
 	def generate_fake(count=100):
@@ -290,6 +332,25 @@ class Comment(db.Model):
 			tags=allowed_tags, strip=True))
 
 db.event.listen(Comment.body, 'set', Comment.on_changed_body)
+
+class Question(db.Model):
+	__tablename__ = 'questions'
+	id = db.Column(db.Integer, primary_key=True)
+	title = db.Column(db.Text)
+	body = db.Column(db.Text)
+	body_html = db.Column(db.Text)
+	timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+	author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+	posts = db.relationship('Post', backref='question', lazy='dynamic')
+
+	@staticmethod
+	def on_changed_body(target, value, oldvalue, initiator):
+		allowed_tags = ['a', 'abbr', 'acronym', 'b', 'code', 'em', 'i', 'strong']
+		target.body_html = bleach.linkify(bleach.clean(
+			markdown(value, output_format='html'),
+			tags=allowed_tags, strip=True))
+
+db.event.listen(Question.body, 'set', Question.on_changed_body)
 
 @login_manager.user_loader
 def load_user(user_id):

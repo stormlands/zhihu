@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Head{% endblock %}
+
+{% block page_content %}
+<div>
+	<a href="{{ url_for('.user', username=current_user.name) }}">
+		<img src="{{ current_user.gravatar(size=60) }}">
+	</a>
+	<a href="{{ url_for('.questions') }}"><p>   提问   </p></a>
+	<a href="{{ url_for('.questions') }}"><p>  {{ endpoint }}   </p></a>
+	<a href="{{ url_for('.user', username=current_user.username) }}"><p>   我的资料   </p></a>
+</div>
+{% if current_user.is_authenticated %}
+<div class="post-user">
+	<a href="{{ url_for('.user', username=current_user.username) }}"    >{{ current_user.username }}</a>
+</div>
+<div class="post-header">
+	<a href="{{ url_for('.user', username=current_user.username) }}"    ><img class="img-rounded profile-thumbnail" src="{{ current_user.gravatar(size=40) }}"></a>
+</div>
+<div>Hello, world!</div>
+{% endif %}
+{% endblock %}
+

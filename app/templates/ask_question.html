@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}提问{% endblock %}
+
+{% block page_content %}
+{% if current_user.is_authenticated %}
+<div class="ask-question">
+	<div class="page-header">
+		<h2>Ask a right question</h2>
+	</div>
+	<div class="question-form">
+		{{ wtf.quick_form(form) }}
+	</div>
+</div>
+{% endif %}
+<div>
+	<h2>全部问题</h2>
+</div>
+{% include '_questions.html' %}
+{% if pagination %}
+<div class="pagination">
+	{{ macros.pagination_widget(pagination, '.questions') }}
+</div>
+{% endif %}
+{% endblock %}
+

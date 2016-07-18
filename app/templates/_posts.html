@@ -8,7 +8,16 @@
 		</div>
 		<div class="post-content">
 			<div class="post-date">{{ moment(post.timestamp).fromNow() }}</div>
-			<div class="post-author"><a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></div>
+			<div class="post-author"><a href="{{ url_for('.user', username=post.author.username) }}"><strong>{{ post.author.username }}</strong></a>
+				{% if question and post.author.about_me %}
+					{{ post.author.about_me }}
+				{% else %}
+					回答了问题
+				{% endif %}
+			</div>
+			{% if not question %}
+			<div class="post-qa"><a href="{{ url_for('.question', id=post.question_id) }}">{{ post.question.title }}</a></div>
+			{% endif %}
 			<div class="post-body">
 				{% if post.body_html %}
 					{{ post.body_html | safe }}
@@ -17,21 +26,27 @@
 				{% endif %}
 			</div>
 			<div class="post-footer">
+				{% if current_user.is_authenticated %}
+					{% if current_user.is_focus_post(post) %}
+					<a href="{{ url_for('.unfocus_post', id=post.id) }}" class="btn btn-default">取消</a>
+					{% else %}
+					<a href="{{ url_for('.focus_post', id=post.id) }}" class="btn btn-success"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>赞</a>
+					{% endif %}
+				{% endif %}
+				<a href="{{ url_for('.focus_post_users', id=post.id) }}">
+					<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>{{ post.focus_users.count() }}人赞同</a>
+				<a href="{{ url_for('.post', id=post.id) }}#comments">
+					<span class="glyphicon glyphicon-comment" aria-hidden="true"></span>{{ post.comments.count() }}条评论</a>
+				<a href="{{ url_for('.post', id=post.id) }}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>显示全部</a>
 				{% if current_user == post.author %}
 				<a href="{{ url_for('.edit', id=post.id) }}">
-					<span class="label label-primary">Edit</span>
+					<span class="glyphicon glyphicon-edit"></span>编辑
 				</a>
 				{% elif current_user.is_administrator() %}
 				<a href="{{ url_for('.edit', id=post.id) }}">
-					<span class="label label-danger">Edit [Admin]</span>
+					<span class="label label-danger">编辑[Admin]</span>
 				</a>
 				{% endif %}
-				<a href="{{ url_for('.post', id=post.id) }}">
-					<span class="label label-default">Permalink</span>
-				</a>
-				<a href="{{ url_for('.post', id=post.id) }}#comments">
-					<span class="label label-primary">{{ post.comments.count() }} Comments</span>
-				</a>
 			</div>
 		</div>
 	</li>

@@ -1,0 +1,9 @@
+{{ user.username }}您好:
+
+恭喜您在问答上注册成功.
+
+为激活您的帐号,请点击下面的邮件认证链接:
+
+{{ url_for('auth.confirm', token=token, _external=True) }}
+
+Good luck to you!

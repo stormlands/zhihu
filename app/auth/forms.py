@@ -32,7 +32,7 @@ class ChangePasswordForm(Form):
 	submit = SubmitField('Update Password')
 
 class PasswordResetRequestForm(Form):
-	emial = StringField('Email', validators=[Required(), Length(1, 64), Email()])
+	email = StringField('Email', validators=[Required(), Length(1, 64), Email()])
 	submit = SubmitField('Reset Password')
 
 class PasswordResetForm(Form):

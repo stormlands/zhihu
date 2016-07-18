@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}点赞的用户{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+	<h2>{{ post.focus_users.count() }} 个赞同</h2>
+</div>
+<ul class="users">
+	{% for user in users %}
+	<li class="user">
+		<div class="user-thumbnail">
+			<a href="{{ url_for('.user', username=user.username) }}">
+				<img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=40) }}">
+			</a>
+		</div>
+		<div class="user-content">
+			<div class="user-follow">
+				{% if current_user.can(Permission.FOLLOW) and user != current_user %}
+					{% if not current_user.is_following(user) %}
+					<a href="{{ url_for('.follow', username=user.username) }}" class="btn btn-primary">Follow</a>
+					{% else %}
+					<a href="{{ url_for('.unfollow', username=user.username) }}" class="btn btn-default">Unfollow</a>
+					{% endif %}
+				{% endif %}
+			</div>
+			<div class="user-about_me"><a href="{{ url_for('.user', username=user.username) }}">{{ user.username }}{% if user.about_me %} {{ user.about_me }}{% endif %}</a></div>
+			<div class="user-profile">
+				<p>{{ user.questions.count() }} questions/{{ user.posts.count() }} posts/{{ user.followers.count() - 1 }} follwers</div>
+		</div>
+	</li>
+	{% endfor %}
+</ul>
+{% if pagination %}
+<div class="pagination">
+	{{ macros.pagination_widget(pagination, '.focus_post_users', id=post.id) }}
+</div>
+{% endif %}
+{% endblock %}
+

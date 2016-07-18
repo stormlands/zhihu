@@ -1,0 +1,6 @@
+<p>{{ user.username }}您好:</p>
+<p>恭喜您在问答上注册成功.</p>
+<p>为激活您的帐号,请您点击下面的邮件认证链接:<a href="{{ url_for('auth.confirm', token=token, _external=True) }}"> 点击此处确认邮件</a></p>
+<p>如果以上链接无法访问，请将下面的网址复制并粘贴至浏览器窗口中直接访问:</p>
+<p>{{ url_for('auth.confirm', token=token, _external=True) }}</p>
+<p>Good luck to you!</p>

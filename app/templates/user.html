@@ -26,7 +26,7 @@
 		Member since {{ moment(user.member_since).format('L') }}.
 		Last seen {{ moment(user.last_seen).fromNow() }}.
 	</p>
-	<p>{{ user.posts.count() }} blog post. {{ user.comments.count() }} comments.</p>
+	<p>{{ user.questions.count() }} 提问 / {{ user.posts.count() }} 回答 / {{ user.comments.count() }} 评论 </p>
 	<p>
 		{% if current_user.can(Permission.FOLLOW) and user != current_user %}
 			{% if not current_user.is_following(user) %}
@@ -35,10 +35,10 @@
 			<a href="{{ url_for('.unfollow', username=user.username) }}" class="btn btn-default">取消关注</a>
 			{% endif %}
 		{% endif %}
-		<a href="{{ url_for('.followers', username=user.username) }}">粉丝:<span class="badge">{{ user.followers.count() - 1 }}</span></a>
-		<a href="{{ url_for('.followed_by', username=user.username) }}">关注:<span class="badge">{{ user.followed.count() - 1 }}</span></a>
+		<a href="{{ url_for('.followers', username=user.username) }}">关注者:<span class="badge">{{ user.followers.count() - 1 }}</span></a>
+		<a href="{{ url_for('.followed_by', username=user.username) }}">关注了:<span class="badge">{{ user.followed.count() - 1 }}</span></a>
 		{% if current_user.is_authenticated and user != current_user and user.is_following(current_user) %}
-		| <span class="label label-default">关注了你</span>
+		| <span class="label label-success">关注了你</span>
 		{% endif %}
 	</p>
 	<p>
@@ -50,8 +50,17 @@
 		{% endif %}
 	</p>
 </div>
-<h3>Posts by {{ user.username }}</h3>
-{% include '_posts.html' %}
+<div class="post-tabs">
+	<ul class="nav nav-tabs">
+		<li{% if not show_answer %} class="active"{% endif %}><a href="{{ url_for('.show_question', username=user.username) }}">Questions</a></li>
+		<li{% if show_answer %} class="active"{% endif %}><a href="{{ url_for('.show_answer', username=user.username) }}">Answers</a></li>
+	</ul>
+	{% if not show_answer %}
+		{% include '_questions.html' %}
+	{% else %}
+		{% include '_posts.html' %}
+	{% endif %}
+</div>
 {% if pagination %}
 <div class="pagination">
 	{{ macros.pagination_widget(pagination, '.user', username=user.username) }}
